@@ -38,11 +38,10 @@ function generateAppointmentApiUrlForDay(daysFromToday) {
 
 
 // Function to call the API
-const callApi = async () => {
+const sendPatientsReminders = async () => {
   try {
     const appointmentData = await axiosInstance.get(generateAppointmentApiUrlForDay(1), {
     })
-    // console.log('API response:', response.data.data)
     const appointments = appointmentData.data.data
     for (const appointment of appointments) {
       await delay(1000)
@@ -63,19 +62,14 @@ const callApi = async () => {
           text: patientInstance.getAppointmentTime()
         }
       ]
-      whatsappSender.sendMessage({to: patientInstance.getPhone(), templateName: 'appointment_reminder', languageCode: patientInstance.getLocale(), parameters})
+      console.log('aquiii')
+      // whatsappSender.sendMessage({to: patientInstance.getPhone(), templateName: 'appointment_reminder', languageCode: patientInstance.getLocale(), parameters})
     }
   } catch (error) {
     console.error('Error calling API:', error)
   }
 }
 
-// Schedule the cron job to run every day at midnight
-// cron.schedule('0 0 * * *', () => {
-//   console.log('Running cron job at midnight')
-// })
 dotenv.config()
 
-  callApi()
-
-console.log('Cron job scheduled. The script will run every day at midnight.')
+await sendPatientsReminders()
