@@ -1,9 +1,9 @@
 import dotenv from 'dotenv'
-import cron from 'node-cron'
-import { PRACTICE_HUB_API } from './constants/urls.js'
 import axiosInstance from './axiosInstance.js'
+import axios from 'axios'
 import WhatsAppSender from './WhatsAppSender.js'
 import Patient from './models/Patient.js'
+import {SLACK_CHANNEL} from "./constants/urls.js";
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -30,21 +30,21 @@ function generateAppointmentApiUrlForDay(daysFromToday) {
   const startTime = `${formattedDate} 00:00:00`
   const endTime = `${formattedDate} 23:59:59`
 
-  // Construct the API URL with the date range for the specific day
-  const apiUrl = `/appointments?start=between:${startTime},${endTime}`
-
-  return apiUrl
+  return `/appointments?start=between:${startTime},${endTime}`
 }
 
 
 // Function to call the API
-const sendPatientsReminders = async () => {
+export const sendPatientsReminders = async () => {
+  axios.post(SLACK_CHANNEL, {
+    text: `Starting sending patient reminders on ${new Date(Date.now()).toUTCString()}`
+  })
   try {
     const appointmentData = await axiosInstance.get(generateAppointmentApiUrlForDay(1), {
     })
     const appointments = appointmentData.data.data
     for (const appointment of appointments) {
-      await delay(1000)
+      await delay(50)
       const patientData = await axiosInstance.get(`/patients/${appointment.patient_id}`)
       const patientInstance = new Patient(patientData.data, appointment)
       const whatsappSender = new WhatsAppSender()
@@ -62,14 +62,17 @@ const sendPatientsReminders = async () => {
           text: patientInstance.getAppointmentTime()
         }
       ]
-      console.log('aquiii')
-      // whatsappSender.sendMessage({to: patientInstance.getPhone(), templateName: 'appointment_reminder', languageCode: patientInstance.getLocale(), parameters})
+      whatsappSender.sendMessage({to: patientInstance.getPhone(), templateName: 'appointment_reminder', languageCode: patientInstance.getLocale(), parameters})
     }
+    axios.post(SLACK_CHANNEL, {
+      text: 'Sending patient finished successfully'
+    })
   } catch (error) {
-    console.error('Error calling API:', error)
+    axios.post(SLACK_CHANNEL, {
+      text: `Error sending patient reminders: ${error.response ? error.response.data : error.message}`,
+    })
   }
 }
 
 dotenv.config()
 
-await sendPatientsReminders()

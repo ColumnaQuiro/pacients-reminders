@@ -6,6 +6,7 @@
   "main": "main.js",
   "scripts": {
     "start": "node src/main.js",
+    "netlify:dev": "netlify dev",
     "types-check": "ts-node",
     "prepare": "husky",
     "precommit": "eslint ."
