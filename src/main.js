@@ -36,9 +36,10 @@ function generateAppointmentApiUrlForDay(daysFromToday) {
 
 // Function to call the API
 export const sendPatientsReminders = async () => {
-  axios.post(SLACK_CHANNEL, {
-    text: `Starting sending patient reminders on ${new Date(Date.now()).toUTCString()}`
-  })
+  // axios.post(SLACK_CHANNEL, {
+  //   text: `Starting sending patient reminders on ${new Date(Date.now()).toUTCString()}`
+  // })
+  console.log(`Starting sending patient reminders on ${new Date(Date.now()).toUTCString()}`)
   try {
     const appointmentData = await axiosInstance.get(generateAppointmentApiUrlForDay(1), {
     })
@@ -64,13 +65,15 @@ export const sendPatientsReminders = async () => {
       ]
       whatsappSender.sendMessage({to: patientInstance.getPhone(), templateName: 'appointment_reminder', languageCode: patientInstance.getLocale(), parameters})
     }
-    axios.post(SLACK_CHANNEL, {
-      text: 'Sending patient finished successfully'
-    })
+    console.log('Sending patient finished successfully')
+    // axios.post(SLACK_CHANNEL, {
+    //   text: 'Sending patient finished successfully'
+    // })
   } catch (error) {
-    axios.post(SLACK_CHANNEL, {
-      text: `Error sending patient reminders: ${error.response ? error.response.data : error.message}`,
-    })
+    console.log('Error sending patient reminders')
+    // axios.post(SLACK_CHANNEL, {
+    //   text: `Error sending patient reminders: ${error.response ? error.response.data : error.message}`,
+    // })
   }
 }
 
