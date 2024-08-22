@@ -41,24 +41,26 @@ export const sendPatientsReminders = async () => {
     const appointments = appointmentData.data.data
     for (const appointment of appointments) {
       await delay(50)
-      const patientData = await axiosInstance.get(`/patients/${appointment.patient_id}`)
-      const patientInstance = new Patient(patientData.data, appointment)
-      const whatsappSender = new WhatsAppSender()
-      const parameters = [
-        {
-          type: "text",
-          text: patientInstance.getName()
-        },
-        {
-          type: "text",
-          text: patientInstance.getAppointmentDate()
-        },
-        {
-          type: "text",
-          text: patientInstance.getAppointmentTime()
-        }
-      ]
-      whatsappSender.sendMessage({to: patientInstance.getPhone(), templateName: 'appointment_reminder', languageCode: patientInstance.getLocale(), parameters})
+      if (appointment.status === 'pending') {
+        const patientData = await axiosInstance.get(`/patients/${appointment.patient_id}`)
+        const patientInstance = new Patient(patientData.data, appointment)
+        const whatsappSender = new WhatsAppSender()
+        const parameters = [
+          {
+            type: "text",
+            text: patientInstance.getName()
+          },
+          {
+            type: "text",
+            text: patientInstance.getAppointmentDate()
+          },
+          {
+            type: "text",
+            text: patientInstance.getAppointmentTime()
+          }
+        ]
+        whatsappSender.sendMessage({to: patientInstance.getPhone(), templateName: 'appointment_reminder', languageCode: patientInstance.getLocale(), parameters})
+      }
     }
     sendSlack('Sending patient finished successfully')
   } catch (error) {
