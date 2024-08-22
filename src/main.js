@@ -1,14 +1,12 @@
 import dotenv from 'dotenv'
 import axiosInstance from './axiosInstance.js'
-import axios from 'axios'
 import WhatsAppSender from './WhatsAppSender.js'
 import Patient from './models/Patient.js'
-import {SLACK_CHANNEL} from "./constants/urls.js";
+import sendSlack from './utils/sendSlack.js'
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 function generateAppointmentApiUrlForDay(daysFromToday) {
-  // Get today's date
   const today = new Date()
 
   // Calculate the target date by adding daysFromToday
@@ -36,10 +34,7 @@ function generateAppointmentApiUrlForDay(daysFromToday) {
 
 // Function to call the API
 export const sendPatientsReminders = async () => {
-  // axios.post(SLACK_CHANNEL, {
-  //   text: `Starting sending patient reminders on ${new Date(Date.now()).toUTCString()}`
-  // })
-  console.log(`Starting sending patient reminders on ${new Date(Date.now()).toUTCString()}`)
+  sendSlack(`Starting sending patient reminders on ${new Date(Date.now()).toUTCString()}`)
   try {
     const appointmentData = await axiosInstance.get(generateAppointmentApiUrlForDay(1), {
     })
@@ -65,15 +60,9 @@ export const sendPatientsReminders = async () => {
       ]
       whatsappSender.sendMessage({to: patientInstance.getPhone(), templateName: 'appointment_reminder', languageCode: patientInstance.getLocale(), parameters})
     }
-    console.log('Sending patient finished successfully')
-    // axios.post(SLACK_CHANNEL, {
-    //   text: 'Sending patient finished successfully'
-    // })
+    sendSlack('Sending patient finished successfully')
   } catch (error) {
-    console.log('Error sending patient reminders')
-    // axios.post(SLACK_CHANNEL, {
-    //   text: `Error sending patient reminders: ${error.response ? error.response.data : error.message}`,
-    // })
+    sendSlack(`Error sending patient reminders: ${error.response ? error.response.data : error.message}`)
   }
 }
 

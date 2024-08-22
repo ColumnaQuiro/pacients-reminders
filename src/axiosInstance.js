@@ -7,6 +7,6 @@ const instance = axios.create({
     'x-practicehub-key': '1NIdhNcm05TJ9JBBGLMmwjfQchTCSa99',
     'x-app-details': 'app_name=columnaquiropracticehub@practicehub.io'
   }
-});
+})
 
 export default instance
