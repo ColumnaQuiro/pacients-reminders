@@ -5,19 +5,21 @@ module.exports = {
   },
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: "module",
+    sourceType: 'module',
   },
   extends: [
-    "eslint:recommended",
+    'eslint:recommended',
   ],
   rules: {
-    "no-restricted-globals": ["error", "name", "length"],
-    "prefer-arrow-callback": "error",
-    "quotes": ["error", "double", {"allowTemplateLiterals": true}],
+    'no-restricted-globals': ['error', 'name', 'length'],
+    'prefer-arrow-callback': 'error',
+    'quotes': ['error', 'single', { 'allowTemplateLiterals': true }],
+    'object-curly-spacing': ['error', 'always'],
+    'semi': ['error', 'never']
   },
   overrides: [
     {
-      files: ["**/*.spec.*"],
+      files: ['**/*.spec.*'],
       env: {
         mocha: true,
       },
@@ -25,4 +27,5 @@ module.exports = {
     },
   ],
   globals: {},
-};
+  plugins: ['eslint-plugin-unused-imports'],
+}

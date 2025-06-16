@@ -1,28 +1,29 @@
-import axios from "axios"
-import { WHATSAPP_API_MESSAGES } from "./constants/urls.js"
+import axios from 'axios'
+import { WHATSAPP_API_MESSAGES } from './constants/urls.js'
 
 export default class WhatsAppSender {
   constructor() {
     this.apiUrl = WHATSAPP_API_MESSAGES
     this.authToken = process.env.WHATSAPP_API_TOKEN
     if (!this.authToken) {
-      throw new Error("WhatsApp API token is not defined in environment variables.")
+      throw new Error('WhatsApp API token is not defined in environment variables.')
     }
   }
 
-  async sendMessage({ to, templateName, languageCode = "en", parameters }) {
+  async sendMessage({ to, templateName, languageCode = 'en', parameters, header = undefined }) {
     const data = {
-      messaging_product: "whatsapp",
+      messaging_product: 'whatsapp',
       to: to,
-      type: "template",
+      type: 'template',
       template: {
         name: templateName,
         language: {
           code: languageCode
         },
         components: [
+          ...(header ? [header] : []),
           {
-            type: "body",
+            type: 'body',
             parameters
           }
         ]
@@ -33,12 +34,12 @@ export default class WhatsAppSender {
       const response = await axios.post(this.apiUrl, data, {
         headers: {
           Authorization: `Bearer ${this.authToken}`,
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         }
       })
-      console.log("Message sent successfully:", response.data)
+      console.log('Message sent successfully:', response.data)
     } catch (error) {
-      console.error("Error sending message:", error.response ? error.response.data : error.message)
+      console.error('Error sending message:', error.response ? error.response.data : error.message)
     }
   }
 }

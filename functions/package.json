@@ -3,9 +3,11 @@
   "description": "Cloud Functions for Firebase",
   "scripts": {
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
+    "sendMessage": "node ./marketingMessage.js",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
@@ -23,6 +25,7 @@
   "devDependencies": {
     "eslint": "8.57.1",
     "eslint-config-google": "0.14.0",
+    "eslint-plugin-unused-imports": "4.1.4",
     "firebase-functions-test": "3.3.0"
   },
   "private": true
