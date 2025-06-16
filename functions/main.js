@@ -1,10 +1,10 @@
-import dotenv from 'dotenv'
 import axiosInstance from './axiosInstance.js'
 import WhatsAppSender from './WhatsAppSender.js'
 import Patient from './models/Patient.js'
 import sendSlack from './utils/sendSlack.js'
+import dotenv from 'dotenv'
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 function generateAppointmentApiUrlForDay(daysFromToday) {
   const today = new Date()
@@ -33,11 +33,11 @@ function generateAppointmentApiUrlForDay(daysFromToday) {
 
 
 // Function to call the API
-export const sendPatientsReminders = async () => {
-  sendSlack(`Starting sending patient reminders on ${new Date(Date.now()).toUTCString()}`)
+export const sendPatientsReminders = async (daysFromToday = 1) => {
+  sendSlack(`Starting sending patient reminders on ${new Date(Date.now()).toUTCString()} from ${daysFromToday} days from today`)
   try {
-    const appointmentData = await axiosInstance.get(generateAppointmentApiUrlForDay(1), {
-    })
+    const appointmentData = await axiosInstance.get(generateAppointmentApiUrlForDay(daysFromToday), {})
+    console.log(appointmentData)
     const appointments = appointmentData.data.data
     for (const appointment of appointments) {
       await delay(50)
@@ -47,26 +47,32 @@ export const sendPatientsReminders = async () => {
         const whatsappSender = new WhatsAppSender()
         const parameters = [
           {
-            type: "text",
-            text: patientInstance.getName()
+            type: 'text',
+            text: patientInstance.getName(),
           },
           {
-            type: "text",
-            text: patientInstance.getAppointmentDate()
+            type: 'text',
+            text: patientInstance.getAppointmentDate(),
           },
           {
-            type: "text",
-            text: patientInstance.getAppointmentTime()
-          }
+            type: 'text',
+            text: patientInstance.getAppointmentTime(),
+          },
         ]
-        whatsappSender.sendMessage({to: patientInstance.getPhone(), templateName: 'appointment_reminder', languageCode: patientInstance.getLocale(), parameters})
+        await whatsappSender.sendMessage({
+          to: patientInstance.getPhone(),
+          templateName: 'appointment_reminder',
+          languageCode: patientInstance.getLocale(),
+          parameters
+        })
       }
     }
     sendSlack('Sending patient finished successfully')
   } catch (error) {
+    console.log(error.response.data.errors.start)
     sendSlack(`Error sending patient reminders: ${error.response ? error.response.data : error.message}`)
   }
 }
 
 dotenv.config()
-
+// sendPatientsReminders()

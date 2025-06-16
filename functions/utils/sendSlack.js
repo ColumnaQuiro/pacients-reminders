@@ -3,9 +3,9 @@ import axios from 'axios'
 export default (text) => {
   try {
     axios.post(process.env.SLACK_CHANNEL, {
-      text
+      text,
     })
-  } catch (e){
+  } catch (e) {
     console.error('Error sending a slack')
   }
 }

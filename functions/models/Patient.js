@@ -4,8 +4,8 @@ export default class Patient {
     this.lastName = patientData.last_name
     this.locale = patientData.locale
     this.phone = patientData.numbers.length > 0 ?
-      `+${patientData.numbers[0].country_code}${patientData.numbers[0].number.replace(/\s/g, '')}`
-      : ''
+      `+${patientData.numbers[0].country_code}${patientData.numbers[0].number.replace(/\s/g, '')}` :
+      ''
     this.appointmentDate = this.formatDate(appointmentData.start)
     this.appointmentTime = this.formatTime(appointmentData.start)
   }

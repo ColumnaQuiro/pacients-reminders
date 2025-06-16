@@ -1,19 +1,16 @@
 import axios from 'axios'
-import { WHATSAPP_API_MESSAGES } from "./constants/urls.js"
+import { WHATSAPP_API_MESSAGES } from './constants/urls.js'
 
 export default class WhatsAppSender {
-  #apiUrl
-  #authToken
-
   constructor() {
-    this.#apiUrl = WHATSAPP_API_MESSAGES
-    this.#authToken = process.env.WHATSAPP_API_TOKEN
-    if (!this.#authToken) {
+    this.apiUrl = WHATSAPP_API_MESSAGES
+    this.authToken = process.env.WHATSAPP_API_TOKEN
+    if (!this.authToken) {
       throw new Error('WhatsApp API token is not defined in environment variables.')
     }
   }
 
-  async sendMessage({ to, templateName, languageCode = 'en', parameters }) {
+  async sendMessage({ to, templateName, languageCode = 'en', parameters, header = undefined }) {
     const data = {
       messaging_product: 'whatsapp',
       to: to,
@@ -24,8 +21,9 @@ export default class WhatsAppSender {
           code: languageCode
         },
         components: [
+          ...(header ? [header] : []),
           {
-            type: "body",
+            type: 'body',
             parameters
           }
         ]
@@ -33,9 +31,9 @@ export default class WhatsAppSender {
     }
 
     try {
-      const response = await axios.post(this.#apiUrl, data, {
+      const response = await axios.post(this.apiUrl, data, {
         headers: {
-          Authorization: `Bearer ${this.#authToken}`,
+          Authorization: `Bearer ${this.authToken}`,
           'Content-Type': 'application/json'
         }
       })
