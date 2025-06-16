@@ -75,4 +75,4 @@ export const sendPatientsReminders = async (daysFromToday = 1) => {
 }
 
 dotenv.config()
-sendPatientsReminders()
+// sendPatientsReminders()
